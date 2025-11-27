@@ -8,11 +8,7 @@
     />
     <title>Trade with Ajay - Stock Analysis</title>
 
-    <!-- Internet Permissions & Security Policy -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
-    />
+    <!-- NOTE: CSP meta hattaya gaya hai taa ki Babel/React eval use kar sake -->
     <meta name="theme-color" content="#0f172a" />
 
     <!-- PWA Settings -->
@@ -46,13 +42,11 @@
               border: "var(--border-color)",
               textMain: "var(--text-main)",
               textMuted: "var(--text-muted)",
-
-              // Keep original palette for specific accents
               primary: "#0f172a",
               secondary: "#1e293b",
-              accent: "#3b82f6", // Blue 500
-              success: "#10b981", // Emerald 500
-              danger: "#ef4444", // Red 500
+              accent: "#3b82f6",
+              success: "#10b981",
+              danger: "#ef4444",
             },
             animation: {
               "pulse-fast":
@@ -82,23 +76,21 @@
     </script>
     <style>
       :root {
-        /* Light Mode Defaults */
-        --bg-main: #f8fafc; /* Slate 50 */
-        --bg-surface: #ffffff; /* White */
-        --bg-highlight: #f1f5f9; /* Slate 100 */
-        --border-color: #e2e8f0; /* Slate 200 */
-        --text-main: #0f172a; /* Slate 900 */
-        --text-muted: #64748b; /* Slate 500 */
+        --bg-main: #f8fafc;
+        --bg-surface: #ffffff;
+        --bg-highlight: #f1f5f9;
+        --border-color: #e2e8f0;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
       }
 
       .dark {
-        /* Dark Mode Defaults */
-        --bg-main: #0f172a; /* Slate 900 */
-        --bg-surface: #1e293b; /* Slate 800 */
-        --bg-highlight: #334155; /* Slate 700 */
-        --border-color: #334155; /* Slate 700 */
-        --text-main: #f1f5f9; /* Slate 100 */
-        --text-muted: #94a3b8; /* Slate 400 */
+        --bg-main: #0f172a;
+        --bg-surface: #1e293b;
+        --bg-highlight: #334155;
+        --border-color: #334155;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
       }
 
       body {
@@ -107,7 +99,6 @@
         -webkit-tap-highlight-color: transparent;
         transition: background-color 0.3s ease, color 0.3s ease;
       }
-      /* Custom scrollbar for webkit */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -128,14 +119,13 @@
       textarea {
         outline: none;
       }
-      /* Loading Spinner for Initial Load */
       #app-loading {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: #0f172a; /* Always dark for loading to match splash */
+        background: #0f172a;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -175,14 +165,12 @@
       }
     </script>
 
-    <!-- Critical: Polyfill process.env to prevent crashes in browser environments -->
     <script>
       window.process = window.process || { env: {} };
     </script>
     <link rel="stylesheet" href="/index.css" />
   </head>
   <body>
-    <!-- Loading Screen -->
     <div id="app-loading">
       <div class="loader"></div>
       <p
@@ -209,7 +197,6 @@
 
     <div id="root"></div>
 
-    <!-- Error Handler for Blank Screen Issues -->
     <script>
       function showFatalError(title, msg) {
         const loading = document.getElementById("app-loading");
@@ -252,7 +239,6 @@
         );
       });
 
-      // Watchdog: If app doesn't load in 8 seconds, show diagnostics
       setTimeout(() => {
         const root = document.getElementById("root");
         if (!root || root.children.length === 0) {
@@ -280,8 +266,7 @@
     ></script>
 
     <script>
-      // Remove loading screen when React mounts
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver(() => {
         if (document.getElementById("root").children.length > 0) {
           const loading = document.getElementById("app-loading");
           if (loading) {
@@ -293,15 +278,14 @@
       });
       observer.observe(document.getElementById("root"), { childList: true });
 
-      // Service Worker Registration
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
             .register("/service-worker.js")
-            .then((registration) => {
+            .then(() => {
               console.log("SW registered");
             })
-            .catch((registrationError) => {
+            .catch(() => {
               console.log("SW registration failed");
             });
         });
