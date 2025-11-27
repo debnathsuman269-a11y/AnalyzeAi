@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Trade with Ajay - Stock Analysis</title>
+    
+    <!-- Internet Permissions & Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <meta name="theme-color" content="#0f172a" />
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TradeAjay" />
+    <meta name="description" content="AI-Powered Stock Market Analysis for Indian and US Markets." />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3310/3310624.png" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              background: 'var(--bg-main)',
+              surface: 'var(--bg-surface)',
+              surfaceHighlight: 'var(--bg-highlight)',
+              border: 'var(--border-color)',
+              textMain: 'var(--text-main)',
+              textMuted: 'var(--text-muted)',
+              
+              // Keep original palette for specific accents
+              primary: '#0f172a', 
+              secondary: '#1e293b', 
+              accent: '#3b82f6', // Blue 500
+              success: '#10b981', // Emerald 500
+              danger: '#ef4444', // Red 500
+            },
+            animation: {
+              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in': 'fadeIn 0.5s ease-out',
+              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      :root {
+        /* Light Mode Defaults */
+        --bg-main: #f8fafc; /* Slate 50 */
+        --bg-surface: #ffffff; /* White */
+        --bg-highlight: #f1f5f9; /* Slate 100 */
+        --border-color: #e2e8f0; /* Slate 200 */
+        --text-main: #0f172a; /* Slate 900 */
+        --text-muted: #64748b; /* Slate 500 */
+      }
+
+      .dark {
+        /* Dark Mode Defaults */
+        --bg-main: #0f172a; /* Slate 900 */
+        --bg-surface: #1e293b; /* Slate 800 */
+        --bg-highlight: #334155; /* Slate 700 */
+        --border-color: #334155; /* Slate 700 */
+        --text-main: #f1f5f9; /* Slate 100 */
+        --text-muted: #94a3b8; /* Slate 400 */
+      }
+
+      body {
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      /* Custom scrollbar for webkit */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-main);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+      }
+      input, button, select, textarea {
+        outline: none;
+      }
+      /* Loading Spinner for Initial Load */
+      #app-loading {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #0f172a; /* Always dark for loading to match splash */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        flex-direction: column;
+        transition: opacity 0.5s ease-out;
+      }
+      .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid #1e293b;
+        border-bottom-color: #3b82f6;
+        border-radius: 50%;
+        animation: rotation 1s linear infinite;
+      }
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- Babel Standalone to compile TSX/JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+      }
+    }
+    </script>
+    
+    <!-- Critical: Polyfill process.env to prevent crashes in browser environments -->
+    <script>
+      window.process = window.process || { env: {} };
+    </script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="app-loading">
+      <div class="loader"></div>
+      <p id="loading-text" style="margin-top: 1rem; color: #94a3b8; font-family: sans-serif; font-size: 0.875rem;">Initializing App...</p>
+      <div id="error-details" style="display: none; margin-top: 20px; text-align: center; padding: 0 20px;"></div>
+    </div>
+
+    <div id="root"></div>
+
+    <!-- Error Handler for Blank Screen Issues -->
+    <script>
+      function showFatalError(title, msg) {
+        const loading = document.getElementById('app-loading');
+        const errorDiv = document.getElementById('error-details');
+        const loader = document.querySelector('.loader');
+        const text = document.getElementById('loading-text');
+        
+        if (loading && errorDiv) {
+            loading.style.backgroundColor = "#0f172a";
+            if(loader) loader.style.display = 'none';
+            if(text) text.style.display = 'none';
+            
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `
+                <div style="color: #ef4444; border: 1px solid #334155; padding: 20px; border-radius: 10px; background: #1e293b; max-width: 500px; margin: 0 auto;">
+                    <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;">${title}</h3>
+                    <p style="font-size: 0.875rem; color: #cbd5e1; margin-bottom: 15px;">${msg}</p>
+                    ${!navigator.onLine ? '<p style="color: #fbbf24; font-size: 0.8rem; margin-bottom: 10px;">⚠️ You appear to be offline. Internet is required for the first load.</p>' : ''}
+                    <button onclick="window.location.reload()" style="margin-top: 0.5rem; padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: bold;">Reload Application</button>
+                </div>
+            `;
+        }
+      }
+
+      window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Global Error:", message, error);
+        if(message.includes('ResizeObserver')) return;
+        showFatalError("App Error", message);
+      };
+      
+      window.addEventListener('unhandledrejection', function(event) {
+        console.error("Promise Rejection:", event.reason);
+        showFatalError("Loading Error", "Failed to load application resources. " + event.reason);
+      });
+
+      // Watchdog: If app doesn't load in 8 seconds, show diagnostics
+      setTimeout(() => {
+        const root = document.getElementById('root');
+        if (!root || root.children.length === 0) {
+            let msg = "The app is taking too long to start.";
+            
+            if (window.location.protocol === 'file:') {
+                msg += "<br><br><b>Local File Detected:</b> Browsers often block scripts when opening HTML files directly. <br>Please try running this via a local server (e.g., VS Code Live Server) or ensure you have an active internet connection for the libraries.";
+            } else if (!navigator.onLine) {
+                msg += "<br><br><b>OFFLINE:</b> Please connect to the internet to download necessary libraries.";
+            }
+            
+            showFatalError("Startup Timeout", msg);
+        }
+      }, 8000);
+    </script>
+
+    <!-- Main Entry Point with Babel for in-browser compilation -->
+    <script type="text/babel" data-type="module" data-presets="react,typescript" src="./index.tsx"></script>
+
+    <script>
+      // Remove loading screen when React mounts
+      const observer = new MutationObserver((mutations) => {
+        if (document.getElementById('root').children.length > 0) {
+            const loading = document.getElementById('app-loading');
+            if (loading) {
+                loading.style.opacity = '0';
+                setTimeout(() => loading.remove(), 500);
+            }
+            observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById('root'), { childList: true });
+
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('SW registered');
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed');
+            });
+        });
+      }
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

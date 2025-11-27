@@ -1,0 +1,33 @@
+{
+  "name": "Trade with Ajay",
+  "short_name": "TradeAjay",
+  "id": "trade-with-ajay-v2",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "categories": ["finance", "productivity", "business"],
+  "description": "AI-powered stock analysis tool for Indian and US markets.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3310/3310624.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3310/3310624.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Analyze Stock",
+      "short_name": "Analyze",
+      "description": "Start a new stock analysis",
+      "url": ".",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3310/3310624.png", "sizes": "192x192" }]
+    }
+  ]
+}

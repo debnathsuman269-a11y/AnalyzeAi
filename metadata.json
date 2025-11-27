@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Trade with Ajay",
+  "description": "An AI-powered stock analysis tool providing technicals, fundamentals, news, and trading levels using Google Gemini.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
