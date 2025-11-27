@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App'; // Removed extension to let resolution handle it
+import App from "./App"; Removed extension to let resolution handle it
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
